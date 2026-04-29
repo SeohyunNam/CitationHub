@@ -52,7 +52,7 @@ This enables more fine-grained and explainable scholarly analysis.
 
 ##  System Interface
 
-![CitationHub Demo System](./assets/CitationHub_UI.jpg)
+![CitationHub Demo System](./assets/citationhub_screenshot.png)
 
 The platform provides several interactive modules for citation exploration and knowledge graph analysis.
 
