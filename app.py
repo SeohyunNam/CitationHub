@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import sys
+print("=== CitationHub app.py starting ===", flush=True)
+
 import base64
 import os
 from pathlib import Path
@@ -29,6 +32,7 @@ def csv_download_link(data: bytes, filename: str, label: str) -> None:
 HF_TOKEN   = os.environ.get("HF_TOKEN", "")
 
 st.set_page_config(page_title="CitationHub", page_icon="📚", layout="wide")
+print("=== set_page_config done ===", flush=True)
 
 ALLOWED_INTENTS = [
     "background","uses","similarities","motivation",
