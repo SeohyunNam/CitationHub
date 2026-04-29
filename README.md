@@ -24,10 +24,6 @@ https://huggingface.co/spaces/Daniel0315/cithub_website
 **CitationHub: A Large-Scale Multi-disciplinary Citation Context Database**
 https://zenodo.org/records/18536895
 
-### Demo Video
-
-The full demo system operation can be verified through the uploaded demonstration video.
-
 ---
 
 ##  Overview
