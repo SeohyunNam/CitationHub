@@ -64,11 +64,14 @@ def fmt_num(x):
     except: return "-"
 
 def _hf_download(filename: str) -> str:
+    print(f"=== HF download START: {filename} ===", flush=True)
     from huggingface_hub import hf_hub_download
-    return hf_hub_download(
+    path = hf_hub_download(
         repo_id=HF_REPO_ID, repo_type="dataset",
         filename=f"data/{filename}", token=HF_TOKEN or None,
     )
+    print(f"=== HF download DONE: {filename} -> {path} ===", flush=True)
+    return path
 
 def _read(filename: str, data_dir: Path | None = None) -> pd.DataFrame:
     if HF_REPO_ID:
