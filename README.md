@@ -3,12 +3,12 @@
 Explore influential papers, citation networks, citation contexts, and knowledge graphs across multidisciplinary scientific domains.
 
 [![Live Demo](https://img.shields.io/badge/Live-Demo-blue)](https://citationdatabase.streamlit.app)
-[![Dataset](https://img.shields.io/badge/Dataset-Zenodo-orange)](https://zenodo.org/records/18536895)
-[![HuggingFace](https://img.shields.io/badge/HuggingFace-Space-yellow)](https://huggingface.co/spaces/Daniel0315/cithub_website)
+[![Dataset](https://img.shields.io/badge/Dataset-HuggingFace-orange)](https://huggingface.co/datasets/Daniel0315/CitationHub)
+[![HuggingFace Space](https://img.shields.io/badge/HuggingFace-Space-yellow)](https://huggingface.co/spaces/Daniel0315/cithub_website)
 
 ---
 
-##  Public Access
+## Public Access
 
 ### Demo Website
 
@@ -18,10 +18,11 @@ https://citationdatabase.streamlit.app
 
 https://huggingface.co/spaces/Daniel0315/cithub_website
 
-### Hugging Face Dataset 
+### Hugging Face Dataset
 
-**CitationHub: A Large-Scale Multi-disciplinary Citation Context Database**
-https://zenodo.org/records/18536895
+**CitationHub: A Large-Scale Multi-disciplinary Citation Context Database**  
+https://huggingface.co/datasets/Daniel0315/CitationHub
+
 
 ---
 
