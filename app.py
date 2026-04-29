@@ -301,29 +301,20 @@ _SEED_COLS = [
     "affiliation_city","affiliation_country","group","cover_date","citedby_count",
     "author_id","affiliation_id","country_id","field_id","journal_id",
 ]
-_EVENT_COLS = [
-    "citation_event_id","cited_seed_paper_id","citing_paper_id",
-    "citing_title","citing_doi","citing_year","citing_venue",
-    "primary_intent","contexts","context_count","intent_count","is_influential","field_id",
-]
-_CITING_COLS = ["citing_paper_id","doi","title","year","venue","oa_pdf"]
-
-def _safe_cols(path: str, wanted: list) -> list:
-    import pyarrow.parquet as pq
-    available = pq.read_schema(path).names
-    return [c for c in wanted if c in available]
+_INTENTS_SQL = "'" + "','".join(["background","uses","similarities","motivation",
+                                  "differences","future_work","extends"]) + "'"
 
 @st.cache_data(show_spinner=False)
 def load_data(data_dir_str: str):
+    import duckdb, pyarrow.parquet as pq
     d = None if HF_REPO_ID else Path(data_dir_str)
 
     seed_path   = _hf_download("seed_cited_papers_normalized.parquet") if HF_REPO_ID else str(d / "seed_cited_papers_normalized.parquet")
     events_path = _hf_download("citation_events_normalized.parquet")   if HF_REPO_ID else str(d / "citation_events_normalized.parquet")
-    citing_path = _hf_download("citing_papers_normalized.parquet")     if HF_REPO_ID else str(d / "citing_papers_normalized.parquet")
 
-    seed_df   = pd.read_parquet(seed_path,   columns=_safe_cols(seed_path,   _SEED_COLS),   engine="pyarrow")
-    events_df = pd.read_parquet(events_path, columns=_safe_cols(events_path, _EVENT_COLS),  engine="pyarrow")
-    citing_df = pd.read_parquet(citing_path, columns=_safe_cols(citing_path, _CITING_COLS), engine="pyarrow")
+    avail = pq.read_schema(seed_path).names
+    cols  = [c for c in _SEED_COLS if c in avail]
+    seed_df = pd.read_parquet(seed_path, columns=cols, engine="pyarrow")
 
     seed = pd.DataFrame({
         "seed_paper_id":  seed_df["seed_paper_id"],
@@ -347,51 +338,119 @@ def load_data(data_dir_str: str):
         seed[f"{col}_lc"] = seed[col].astype(str).str.lower()
     seed = seed.sort_values(["citedby_count","title"], ascending=[False,True]).reset_index(drop=True)
 
-    events = pd.DataFrame({
-        "citation_event_id": events_df["citation_event_id"],
-        "seed_paper_id":     events_df["cited_seed_paper_id"],
-        "citing_paper_id":   events_df["citing_paper_id"],
-        "citing_title":      events_df.get("citing_title", pd.Series(dtype=str)).fillna(""),
-        "citing_doi":        events_df.get("citing_doi", pd.Series(dtype=str)).fillna(""),
-        "citing_year":       pd.to_numeric(events_df.get("citing_year"), errors="coerce"),
-        "citing_venue":      events_df.get("citing_venue", pd.Series(dtype=str)).fillna(""),
-        "primary_intent":    events_df.get("primary_intent", pd.Series(dtype=str)).fillna(""),
-        "contexts":          events_df.get("contexts"),
-        "context_count":     pd.to_numeric(events_df.get("context_count"), errors="coerce").fillna(0).astype(int),
-        "intent_count":      pd.to_numeric(events_df.get("intent_count"), errors="coerce").fillna(0).astype(int),
-        "is_influential":    events_df.get("is_influential", pd.Series(dtype=bool)).fillna(False),
-        "field_id":          events_df.get("field_id", pd.Series(dtype=object)),
-    })
-    events = events[events["primary_intent"].isin(ALLOWED_INTENTS)].reset_index(drop=True)
-
-    citing = pd.DataFrame({
-        "citing_paper_id": citing_df["citing_paper_id"],
-        "doi":    citing_df.get("doi",   pd.Series(dtype=str)).fillna(""),
-        "title":  citing_df.get("title", pd.Series(dtype=str)).fillna(""),
-        "year":   pd.to_numeric(citing_df.get("year"), errors="coerce"),
-        "venue":  citing_df.get("venue", pd.Series(dtype=str)).fillna(""),
-        "oa_pdf": citing_df.get("oa_pdf",pd.Series(dtype=str)).fillna(""),
-    })
+    ep = events_path.replace("\\", "/")
+    stats = duckdb.execute(f"""
+        SELECT MIN(citing_year) AS yr_min, MAX(citing_year) AS yr_max,
+               COUNT(*) AS total, COUNT(DISTINCT citing_paper_id) AS n_citing
+        FROM read_parquet('{ep}')
+        WHERE primary_intent IN ({_INTENTS_SQL})
+    """).df().iloc[0]
 
     filters = {
         "fields":    sorted([x for x in seed["field"].dropna().astype(str).unique() if x]),
         "countries": sorted([x for x in seed["country"].dropna().astype(str).unique() if x]),
         "journals":  sorted([x for x in seed["journal"].dropna().astype(str).unique() if x]),
         "intents":   ALLOWED_INTENTS,
-        "year_min":  int(events["citing_year"].dropna().min()) if events["citing_year"].notna().any() else 2000,
-        "year_max":  int(events["citing_year"].dropna().max()) if events["citing_year"].notna().any() else 2025,
+        "year_min":  int(stats["yr_min"]) if pd.notna(stats["yr_min"]) else 2000,
+        "year_max":  int(stats["yr_max"]) if pd.notna(stats["yr_max"]) else 2025,
     }
     overview = {
         "seed_papers":     int(len(seed)),
-        "citation_events": int(len(events)),
-        "citing_papers":   int(events["citing_paper_id"].nunique()),
+        "citation_events": int(stats["total"]),
+        "citing_papers":   int(stats["n_citing"]),
         "authors":         int(seed["author"].replace("", pd.NA).dropna().nunique()),
         "journals":        int(seed["journal"].replace("", pd.NA).dropna().nunique()),
         "countries":       int(seed["country"].replace("", pd.NA).dropna().nunique()),
         "fields":          int(seed["field"].replace("", pd.NA).dropna().nunique()),
         "intents":         len(ALLOWED_INTENTS),
     }
-    return seed, events, citing, filters, overview
+    return seed, events_path, filters, overview
+
+@st.cache_data(show_spinner=False)
+def load_events_for_paper(events_path: str, seed_paper_id: str, year_min: int, year_max: int) -> pd.DataFrame:
+    import duckdb
+    ep   = events_path.replace("\\", "/")
+    sid  = seed_paper_id.replace("'", "''")
+    return duckdb.execute(f"""
+        SELECT citation_event_id,
+               cited_seed_paper_id AS seed_paper_id,
+               citing_paper_id, citing_title, citing_doi,
+               TRY_CAST(citing_year AS INTEGER) AS citing_year,
+               citing_venue, primary_intent, contexts,
+               TRY_CAST(context_count AS INTEGER) AS context_count,
+               TRY_CAST(intent_count  AS INTEGER) AS intent_count,
+               is_influential
+        FROM read_parquet('{ep}')
+        WHERE cited_seed_paper_id = '{sid}'
+          AND primary_intent IN ({_INTENTS_SQL})
+          AND TRY_CAST(citing_year AS INTEGER) BETWEEN {year_min} AND {year_max}
+        ORDER BY context_count DESC NULLS LAST
+    """).df()
+
+@st.cache_data(show_spinner=False)
+def load_global_intent_stats(events_path: str) -> pd.DataFrame:
+    import duckdb
+    ep = events_path.replace("\\", "/")
+    return duckdb.execute(f"""
+        SELECT primary_intent AS intent, COUNT(*) AS count
+        FROM read_parquet('{ep}')
+        WHERE primary_intent IN ({_INTENTS_SQL})
+        GROUP BY primary_intent
+    """).df()
+
+@st.cache_data(show_spinner=False)
+def load_cocited_papers(events_path: str, selected_seed_id: str, top_n: int = 15) -> pd.DataFrame:
+    import duckdb
+    ep  = events_path.replace("\\", "/")
+    sid = selected_seed_id.replace("'", "''")
+    return duckdb.execute(f"""
+        WITH citing_ids AS (
+            SELECT DISTINCT citing_paper_id
+            FROM read_parquet('{ep}')
+            WHERE cited_seed_paper_id = '{sid}'
+        )
+        SELECT cited_seed_paper_id AS seed_paper_id, COUNT(*) AS co_citation_count
+        FROM read_parquet('{ep}')
+        WHERE citing_paper_id IN (SELECT citing_paper_id FROM citing_ids)
+          AND cited_seed_paper_id != '{sid}'
+        GROUP BY cited_seed_paper_id
+        ORDER BY co_citation_count DESC
+        LIMIT {top_n}
+    """).df()
+
+@st.cache_data(show_spinner=False)
+def load_analytics_data(events_path: str) -> dict:
+    import duckdb
+    ep = events_path.replace("\\", "/")
+
+    intent_trend = duckdb.execute(f"""
+        SELECT TRY_CAST(citing_year AS INTEGER) AS year,
+               primary_intent, COUNT(*) AS count
+        FROM read_parquet('{ep}')
+        WHERE primary_intent IN ({_INTENTS_SQL})
+          AND TRY_CAST(citing_year AS INTEGER) >= 2000
+        GROUP BY year, primary_intent
+        ORDER BY year
+    """).df()
+
+    venues = duckdb.execute(f"""
+        SELECT citing_venue, COUNT(*) AS count
+        FROM read_parquet('{ep}')
+        WHERE primary_intent IN ({_INTENTS_SQL})
+          AND citing_venue IS NOT NULL AND citing_venue != ''
+        GROUP BY citing_venue
+        ORDER BY count DESC
+        LIMIT 20
+    """).df()
+
+    influential = duckdb.execute(f"""
+        SELECT is_influential, COUNT(*) AS count
+        FROM read_parquet('{ep}')
+        WHERE primary_intent IN ({_INTENTS_SQL})
+        GROUP BY is_influential
+    """).df()
+
+    return {"intent_trend": intent_trend, "venues": venues, "influential": influential}
 
 @st.cache_data(show_spinner=False)
 def load_authors_data(data_dir_str: str) -> pd.DataFrame:
@@ -620,8 +679,7 @@ with st.sidebar:
 
     try:
         _loading_placeholder.info("⏳ Loading CitationHub data… this may take a moment on first visit.")
-        seed, events, citing, filters, overview = load_data(data_dir_val)
-        print("=== load_data done ===", flush=True)
+        seed, events_path, filters, overview = load_data(data_dir_val)
         _loading_placeholder.empty()
         st.success("Data loaded")
     except Exception as e:
@@ -665,7 +723,7 @@ with st.sidebar:
     st.session_state["selected_seed_id"] = selected_seed_id
 
 selected_seed  = seed_filtered[seed_filtered["seed_paper_id"]==selected_seed_id].iloc[0]
-seed_events    = event_subset(events, selected_seed_id, year_min, year_max)
+seed_events    = load_events_for_paper(events_path, selected_seed_id, year_min, year_max)
 intent_summary = build_intent_summary(seed_events)
 contexts_df    = build_context_rows(seed_events)
 citing_table   = build_citing_table(seed_events)
@@ -698,7 +756,8 @@ with tab_overview:
 
         st.subheader("Co-cited seed papers")
         st.caption("Other top 5% cited papers that appear together with the selected paper in the same citing works")
-        cocited = get_cocited_papers(selected_seed_id, events, seed)
+        cocited = load_cocited_papers(events_path, selected_seed_id).merge(
+            seed[["seed_paper_id","title","field","journal","citedby_count"]], on="seed_paper_id", how="left")
         if cocited.empty:
             st.info("Co-cited papers not found.")
         else:
@@ -715,9 +774,9 @@ with tab_overview:
         st.plotly_chart(fig, use_container_width=True)
 
         st.subheader("CitationHub Intent Distribution")
-        all_intents = events.groupby("primary_intent").size().to_dict()
+        _gi = load_global_intent_stats(events_path).set_index("intent")["count"].to_dict()
         ai_df = pd.DataFrame({"intent": ALLOWED_INTENTS,
-                               "count": [int(all_intents.get(i, 0)) for i in ALLOWED_INTENTS]})
+                               "count": [int(_gi.get(i, 0)) for i in ALLOWED_INTENTS]})
         fig2 = px.bar(ai_df, x="intent", y="count", color="intent",
                       color_discrete_map=INTENT_COLORS)
         fig2.update_layout(showlegend=False, xaxis_title="", yaxis_title="Count")
@@ -998,13 +1057,24 @@ with tab_analytics:
     st.markdown("---")
     col_c, col_d = st.columns(2)
 
+    _agg = load_analytics_data(events_path)
+    _seed_field_map = seed.set_index("seed_paper_id")["field"].to_dict()
+
     with col_c:
         st.subheader("CitationHub Field × Intent Distribution Heatmap")
-        fi = (seed[["seed_paper_id","field"]]
-              .merge(events[["seed_paper_id","primary_intent"]], on="seed_paper_id", how="inner")
-              .groupby(["field","primary_intent"]).size().reset_index(name="count"))
-        if not fi.empty:
-            pivot = fi.pivot(index="field", columns="primary_intent", values="count").fillna(0)
+        import duckdb as _addb
+        ep = events_path.replace("\\", "/")
+        _fi_raw = _addb.execute(f"""
+            SELECT cited_seed_paper_id AS seed_paper_id, primary_intent, COUNT(*) AS count
+            FROM read_parquet('{ep}')
+            WHERE primary_intent IN ({_INTENTS_SQL})
+            GROUP BY cited_seed_paper_id, primary_intent
+        """).df()
+        _fi_raw["field"] = _fi_raw["seed_paper_id"].map(_seed_field_map).fillna("")
+        fi2 = (_fi_raw[_fi_raw["field"] != ""]
+               .groupby(["field","primary_intent"])["count"].sum().reset_index())
+        if not fi2.empty:
+            pivot = fi2.pivot(index="field", columns="primary_intent", values="count").fillna(0)
             st.plotly_chart(
                 px.imshow(pivot, color_continuous_scale="Blues",
                           title="CitationHub Field × Intent Distribution Heatmap",
@@ -1026,13 +1096,7 @@ with tab_analytics:
     st.markdown("---")
     st.subheader("CitationHub Intent Evolution over Years")
     st.caption("How citation intents have changed across all papers over time")
-    intent_trend_raw = (
-        events.dropna(subset=["citing_year"])
-        .assign(year=lambda df: df["citing_year"].astype(int))
-        .query("year >= 2000")
-        .groupby(["year", "primary_intent"]).size()
-        .reset_index(name="count")
-    )
+    intent_trend_raw = _agg["intent_trend"]
     if not intent_trend_raw.empty:
         st.plotly_chart(
             px.area(
@@ -1053,12 +1117,7 @@ with tab_analytics:
     with col_v1:
         st.subheader("Top Citing Venues")
         st.caption("Journals/conferences that cite seed papers most")
-        venue_cnt = (
-            events[events["citing_venue"].str.strip() != ""]
-            .groupby("citing_venue").size()
-            .reset_index(name="count")
-            .sort_values("count", ascending=False).head(20)
-        )
+        venue_cnt = _agg["venues"]
         if not venue_cnt.empty:
             st.plotly_chart(
                 px.bar(venue_cnt, x="count", y="citing_venue", orientation="h",
@@ -1071,11 +1130,7 @@ with tab_analytics:
     with col_v2:
         st.subheader("CitationHub Field × Intent Distribution")
         st.caption("How each field uses citations differently (all fields)")
-        fi_pct = (
-            seed[["seed_paper_id", "field"]]
-            .merge(events[["seed_paper_id", "primary_intent"]], on="seed_paper_id", how="inner")
-            .groupby(["field", "primary_intent"]).size().reset_index(name="count")
-        )
+        fi_pct = fi2.copy()
         if not fi_pct.empty:
             totals = fi_pct.groupby("field")["count"].transform("sum")
             fi_pct["pct"] = (fi_pct["count"] / totals * 100).round(1)
