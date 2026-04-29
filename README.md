@@ -8,9 +8,9 @@ Explore influential papers, citation networks, citation contexts, and knowledge 
 
 ---
 
-##  Access
+##  Public Access
 
-### Live Demo Website
+### Demo Website
 
 https://citationdatabase.streamlit.app
 
@@ -18,7 +18,7 @@ https://citationdatabase.streamlit.app
 
 https://huggingface.co/spaces/Daniel0315/cithub_website
 
-### Dataset (Zenodo)
+### Hugging Face Dataset 
 
 **CitationHub: A Large-Scale Multi-disciplinary Citation Context Database**
 https://zenodo.org/records/18536895
