@@ -12,7 +12,6 @@ Explore influential papers, citation networks, citation contexts, and knowledge 
 
 ### Live Demo Website
 
-**CitationHub Demo System**
 https://citationdatabase.streamlit.app
 
 ### Hugging Face Space
