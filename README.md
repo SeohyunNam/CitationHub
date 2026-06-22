@@ -24,7 +24,7 @@ https://citationdatabase.streamlit.app
 https://huggingface.co/spaces/Daniel0315/cithub_website
 
 ### Hugging Face Dataset
-https://huggingface.co/datasets/Daniel0315/CitationHub
+https://huggingface.co/datasets/Daniel0315/IDCite
 
 ---
 
