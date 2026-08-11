@@ -4,7 +4,7 @@
 [![Interactive Dashboard](https://img.shields.io/badge/Live-Demo-blue)](https://app.arcade.software/share/videos/82VtIYDsOhm1eMdnMzDf)
 [![HuggingFace Space](https://img.shields.io/badge/HuggingFace-Space-yellow)](https://huggingface.co/spaces/Daniel0315/cithub_website)
 [![HuggingFace Dataset](https://img.shields.io/badge/HuggingFace-Dataset-orange)](https://huggingface.co/datasets/Daniel0315/CitationHub)
-
+[![Zenodo Record](https://img.shields.io/badge/Zenodo-Record-blue)](https://doi.org/10.5281/zenodo.20796923)
 
 Explore influential papers, citation networks, citation contexts, and knowledge graphs across multidisciplinary scientific domains.
 
@@ -25,6 +25,12 @@ https://huggingface.co/spaces/Daniel0315/cithub_website
 
 ### Hugging Face Dataset
 https://huggingface.co/datasets/Daniel0315/IDCite
+
+### Zenodo Record
+
+**IDCite: A Large-Scale Multidisciplinary Citation Intent Dataset for Scholarly Knowledge Discovery (Version 3)**
+
+[https://doi.org/10.5281/zenodo.20796923](https://doi.org/10.5281/zenodo.20796923)
 
 ---
 
@@ -52,6 +58,18 @@ Unlike traditional citation databases that treat citations as simple links betwe
 This enables more fine-grained and explainable scholarly analysis.
 
 ---
+
+## CitationHub and IDCite
+
+The relationship between the two resources can be summarized as:
+
+**IDCite → Structured data and knowledge graph layer**
+
+**CitationHub → Interactive exploration and visualization layer**
+
+IDCite provides the underlying citation events, contexts, intents, scholarly entities, and graph relationships, while CitationHub provides interfaces for interactively exploring and visualizing these resources.
+
+CitationHub is therefore **not a separate version of the IDCite dataset**, but an application layer built on top of the IDCite data infrastructure.
 
 
 ##  Quick Demo Preview
