@@ -1,6 +1,6 @@
 # CitationHub
 
-[![CitationHub Website](https://img.shields.io/badge/Official-Website-green)](https://citation-hub-website.vercel.app/)
+[![CitationHub Website](https://img.shields.io/badge/CitationHub-Website-green)](https://citation-hub-website.vercel.app/)
 [![IDCite Project Page](https://img.shields.io/badge/IDCite-Project%20Page-purple)](https://seohyunnam.github.io/IDCite-Website/)
 [![Interactive Dashboard](https://img.shields.io/badge/Live-Demo-blue)](https://app.arcade.software/share/videos/82VtIYDsOhm1eMdnMzDf)
 [![HuggingFace Space](https://img.shields.io/badge/HuggingFace-Space-yellow)](https://huggingface.co/spaces/Daniel0315/cithub_website)
