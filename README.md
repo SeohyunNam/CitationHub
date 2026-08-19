@@ -80,11 +80,10 @@ CitationHub is therefore **not a separate version of the IDCite dataset**, but a
 
 ![Demo GIF](./assets/demo.gif)
 
-The video above demonstrates the main workflow of the CitationHub system, including citation context exploration, citation network analysis, knowledge graph visualization, and interactive dashboard navigation.
-Users can efficiently explore citation relationships, intent-aware citation behaviors, and multidisciplinary scholarly connections through the platform.
-The platform provides several interactive modules for citation exploration and knowledge graph analysis.
+The clip above is the **Streamlit dashboard** in this repository (`app.py`), not the CitationHub website. It is a lightweight IDCite browser: seed papers, citation contexts and intents, and simple network views, meant for anyone who wants a dashboard up quickly.
 
-**🎥 See CitationHub in action:** [Watch the interactive demo](https://app.arcade.software/share/videos/82VtIYDsOhm1eMdnMzDf)
+**🎥 See the Streamlit dashboard in action:** [Watch the interactive demo](https://app.arcade.software/share/videos/82VtIYDsOhm1eMdnMzDf)
+
 
 ---
 
