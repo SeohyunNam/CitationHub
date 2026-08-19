@@ -82,14 +82,17 @@ CitationHub is therefore **not a separate version of the IDCite dataset**, but a
 
 The clip above is the **Streamlit dashboard** in this repository (`app.py`), not the CitationHub website. It is a lightweight IDCite browser: seed papers, citation contexts and intents, and simple network views, meant for anyone who wants a dashboard up quickly.
 
-**🎥 See the Streamlit dashboard in action:** [Watch the interactive demo](https://app.arcade.software/share/videos/82VtIYDsOhm1eMdnMzDf)
+The CitationHub **system** — Search, Authors, Analytics, Geographic Map, Citation Network, Knowledge Graph, and SPARQL — is the live site:
 
+https://citation-hub-website.vercel.app/
+
+**🎥 See the Streamlit dashboard in action:** [Watch the interactive demo](https://app.arcade.software/share/videos/82VtIYDsOhm1eMdnMzDf)
 
 ---
 
 ## Main Features
 
-The Search interface is [CitationHub](https://citation-hub-website.vercel.app). Each item below is a view over the same IDCite tables.
+The live interface is [CitationHub](https://citation-hub-website.vercel.app). Items follow the site’s navigation order, each a view over the same IDCite tables.
 
 ### 1. Search
 
@@ -127,49 +130,20 @@ Name search over seed-paper creators, grouped by `author_id`. Each result shows 
 
 ---
 
-### 3. Citation Network
+### 3. Analytics
 
-For a chosen seed paper, a force-directed **citation neighborhood** (not the full knowledge graph):
+Corpus-wide statistics over all **1,857,503 citation events**:
 
-* the seed paper at the center
-* citing papers as nodes, colored by primary intent (`background`, `uses`, `similarities`, `motivation`, `differences`, `future_work`, `extends`)
-* node size reflects available citation-context evidence
-
-Pan, zoom, and click a node for title, year, and intent; **View Detail** opens the paper page. Co-cited seed papers are on paper detail, not on this graph.
-
----
-
-### 4. Knowledge Graph
-
-A heterogeneous graph of **typed scholarly entities** around a seed paper.
-
-**Knowledge Graph tab**
-
-* node types: seed paper, citing paper, citation event, journal, author, affiliation, city, country, field, intent
-* pan, zoom, and click a node for its type and label; edges are labelled
-
-**Citation Event Schema tab**
-
-* a `CitationEvent` links a `CitingPaper` to a `SeedPaper` with an intent
-* seed papers further link to journals, authors, affiliations, geography, and fields
+| Panel | What it shows |
+|---|---|
+| Citation Intent Distribution | Counts for the seven canonical intents |
+| Influential Citations | Share of events marked influential |
+| Citation Intent Trend Over Time | Intent mix by citing year |
+| Top Citing Venues | Journals and preprint servers that cite seed papers most often |
 
 ---
 
-### 5. SPARQL
-
-A read-only query console over the RDF conversion of that graph (about **25.1 million triples**).
-
-* namespaces: resources `http://citationhub.org/id/`, ontology `http://citationhub.org/ontology/` (`ch:`)
-* classes: SeedPaper, CitingPaper, CitationEvent, Author, Journal, Affiliation, City, Country, Field, Intent
-* editor for SELECT / ASK / CONSTRUCT / DESCRIBE
-* example queries (most-cited seed papers, intent distribution, top fields, top authors, top countries, total triples), ontology panel, results table, CSV download
-* INSERT / DELETE and other update operations are rejected
-
-The SPARQL engine is **QLever**; the public UI only sees the proxied explorer.
-
----
-
-### 6. Geographic Map
+### 4. Geographic Map
 
 Where seed-paper authors and affiliations are located. Three switchable layers on the same world map:
 
@@ -186,16 +160,45 @@ IDCite names every affiliation’s city and country but carries **no latitude or
 
 ---
 
-### 7. Analytics
+### 5. Citation Network
 
-Corpus-wide statistics over all **1,857,503 citation events**:
+For a chosen seed paper, a force-directed **citation neighborhood** (not the full knowledge graph):
 
-| Panel | What it shows |
-|---|---|
-| Citation Intent Distribution | Counts for the seven canonical intents |
-| Influential Citations | Share of events marked influential |
-| Citation Intent Trend Over Time | Intent mix by citing year |
-| Top Citing Venues | Journals and preprint servers that cite seed papers most often |
+* the seed paper at the center
+* citing papers as nodes, colored by primary intent (`background`, `uses`, `similarities`, `motivation`, `differences`, `future_work`, `extends`)
+* node size reflects available citation-context evidence
+
+Pan, zoom, and click a node for title, year, and intent; **View Detail** opens the paper page. Co-cited seed papers are on paper detail, not on this graph.
+
+---
+
+### 6. Knowledge Graph
+
+A heterogeneous graph of **typed scholarly entities** around a seed paper.
+
+**Knowledge Graph tab**
+
+* node types: seed paper, citing paper, citation event, journal, author, affiliation, city, country, field, intent
+* pan, zoom, and click a node for its type and label; edges are labelled
+
+**Citation Event Schema tab**
+
+* a `CitationEvent` links a `CitingPaper` to a `SeedPaper` with an intent
+* seed papers further link to journals, authors, affiliations, geography, and fields
+
+---
+
+### 7. SPARQL
+
+A read-only query console over the RDF conversion of that graph (about **25.1 million triples**).
+
+* namespaces: resources `http://citationhub.org/id/`, ontology `http://citationhub.org/ontology/` (`ch:`)
+* classes: SeedPaper, CitingPaper, CitationEvent, Author, Journal, Affiliation, City, Country, Field, Intent
+* editor for SELECT / ASK / CONSTRUCT / DESCRIBE
+* example queries (most-cited seed papers, intent distribution, top fields, top authors, top countries, total triples), ontology panel, results table, CSV download
+* INSERT / DELETE and other update operations are rejected
+
+The SPARQL engine is **QLever**; the public UI only sees the proxied explorer.
 
 ---
 
@@ -286,6 +289,6 @@ We are expanding CitationHub toward:
 Readers should know that `app.py` in this repository is **not** the CitationHub system.
 It is a **Streamlit dashboard** over IDCite: a compact, single-file prototype for browsing seed papers, citation events, intents, and simple network views.
 
-If you want to stand up a dashboard on IDCite quickly, you can use `app.py` and `requirements.txt` in this repo. Point it at a local Parquet directory (`CITATIONHUB_DATA_DIR`) or a Hugging Face dataset (`HF_REPO_ID`). 
+If you want to stand up a dashboard on IDCite quickly, you can use `app.py` and `requirements.txt` in this repo. Point it at a local Parquet directory (`CITATIONHUB_DATA_DIR`) or a Hugging Face dataset (`HF_REPO_ID`).
 
 ---
