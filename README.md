@@ -282,11 +282,11 @@ We are expanding CitationHub toward:
 
 ---
 
-## Note on `app.py`
+## Note
 
 Readers should know that `app.py` in this repository is **not** the CitationHub system.
 It is a **Streamlit dashboard** over IDCite: a compact, single-file prototype for browsing seed papers, citation events, intents, and simple network views.
 
-If you want to stand up a dashboard on IDCite quickly, you can use `app.py` and `requirements.txt` in this repository. Point it at a local Parquet directory (`CITATIONHUB_DATA_DIR`) or a Hugging Face dataset (`HF_REPO_ID`). 
+If you want to stand up a dashboard on IDCite quickly, you can use `app.py` and `requirements.txt` in this repo. Point it at a local Parquet directory (`CITATIONHUB_DATA_DIR`) or a Hugging Face dataset (`HF_REPO_ID`). 
 
 ---
