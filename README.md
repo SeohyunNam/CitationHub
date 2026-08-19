@@ -90,7 +90,7 @@ The platform provides several interactive modules for citation exploration and k
 
 ## Main Features
 
-The live interface is [CitationHub](https://citation-hub-website.vercel.app). Each item below is a view over the same IDCite tables.
+The Search interface is [CitationHub](https://citation-hub-website.vercel.app). Each item below is a view over the same IDCite tables.
 
 ### 1. Search
 
@@ -284,7 +284,7 @@ We are expanding CitationHub toward:
 
 ## Note on `app.py`
 
-Readers should know that `app.py` in this repository is **not** the CitationHub system (the Next.js / FastAPI website at [citation-hub-website.vercel.app](https://citation-hub-website.vercel.app)).
+Readers should know that `app.py` in this repository is **not** the CitationHub system.
 It is a **Streamlit dashboard** over IDCite: a compact, single-file prototype for browsing seed papers, citation events, intents, and simple network views.
 
 If you want to stand up a dashboard on IDCite quickly, you can use `app.py` and `requirements.txt` in this repository. Point it at a local Parquet directory (`CITATIONHUB_DATA_DIR`) or a Hugging Face dataset (`HF_REPO_ID`). 
