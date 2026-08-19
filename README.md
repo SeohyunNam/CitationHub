@@ -90,87 +90,130 @@ The platform provides several interactive modules for citation exploration and k
 
 ## Main Features
 
-### 1. Dashboard
+The live interface is [CitationHub](https://citation-hub-website.vercel.app). Each item below is a view over the same IDCite tables.
 
-Users can explore:
+### 1. Search
 
-* highly cited seed papers
-* citation event statistics
-* citation intent distributions
-* field distributions
-* related citing papers
-* co-cited seed papers
+Catalogue of the 23,479 highly cited **seed papers**.
 
-Supported filters include:
+* token-based search on titles and DOIs (not only exact strings)
+* sidebar filters: **Field**, **Country**, **Journal**
+* pagination and CSV export of the result list
 
-* Title or DOI
-* Field
-* Country
-* Journal
-* Citation Year
+Opening a card leads to **paper detail** (`/papers/[id]`):
 
-This enables efficient exploration of citation behaviors across scientific disciplines.
+| Tab | Content |
+|---|---|
+| Overview | Intent distribution and summary statistics |
+| Citing Papers | Papers that cite this seed paper |
+| Co-cited | Other seed papers co-cited with this one |
+| Citation Contexts | In-text citation snippets |
 
----
-
-### 2. Citation Network
-
-Visual exploration of relationships among:
-
-* seed papers
-* citing papers
-* co-cited papers
-
-This helps identify citation flow and scholarly influence propagation.
+The header carries title, field, country, DOI, cited-by count, citation-event count, journal, author, affiliation, and city, with shortcuts to the knowledge graph and a per-paper citation CSV.
 
 ---
 
-### 3. Knowledge Graph
+### 2. Authors
 
-CitationHub transforms citation events into structured scholarly knowledge graphs for:
+Name search over seed-paper creators, grouped by `author_id`. Each result shows affiliation, country, primary field, number of seed papers, and total citations of those papers.
 
-* semantic querying
-* graph-based reasoning
-* citation event understanding
-* explainable scholarly discovery
+**Author detail** (`/authors/[id]`) adds:
 
----
-
-### 4. Geographic Map
-
-Global visualization of citation distributions by:
-
-* country
-* institution
-* affiliation
-
-This supports international collaboration analysis.
+* affiliations, fields, and countries
+* seed-paper count, total citations, and citation-event count
+* **Citation Intent Distribution** — why the author’s papers are cited
+* citations over time
+* top citing venues
+* the author’s seed-paper list
 
 ---
 
-### 5. Analytics
+### 3. Citation Network
 
-Advanced analytics for:
+For a chosen seed paper, a force-directed **citation neighborhood** (not the full knowledge graph):
 
-* citation intent comparison
-* field-level analysis
-* journal-level patterns
-* temporal citation trends
+* the seed paper at the center
+* citing papers as nodes, colored by primary intent (`background`, `uses`, `similarities`, `motivation`, `differences`, `future_work`, `extends`)
+* node size reflects available citation-context evidence
+
+Pan, zoom, and click a node for title, year, and intent; **View Detail** opens the paper page. Co-cited seed papers are on paper detail, not on this graph.
+
+---
+
+### 4. Knowledge Graph
+
+A heterogeneous graph of **typed scholarly entities** around a seed paper.
+
+**Knowledge Graph tab**
+
+* node types: seed paper, citing paper, citation event, journal, author, affiliation, city, country, field, intent
+* pan, zoom, and click a node for its type and label; edges are labelled
+
+**Citation Event Schema tab**
+
+* a `CitationEvent` links a `CitingPaper` to a `SeedPaper` with an intent
+* seed papers further link to journals, authors, affiliations, geography, and fields
+
+---
+
+### 5. SPARQL
+
+A read-only query console over the RDF conversion of that graph (about **25.1 million triples**).
+
+* namespaces: resources `http://citationhub.org/id/`, ontology `http://citationhub.org/ontology/` (`ch:`)
+* classes: SeedPaper, CitingPaper, CitationEvent, Author, Journal, Affiliation, City, Country, Field, Intent
+* editor for SELECT / ASK / CONSTRUCT / DESCRIBE
+* example queries (most-cited seed papers, intent distribution, top fields, top authors, top countries, total triples), ontology panel, results table, CSV download
+* INSERT / DELETE and other update operations are rejected
+
+The SPARQL engine is **QLever**; the public UI only sees the proxied explorer.
+
+---
+
+### 6. Geographic Map
+
+Where seed-paper authors and affiliations are located. Three switchable layers on the same world map:
+
+| Layer | What it draws |
+|---|---|
+| **By country** | Choropleth of paper counts (darker = more papers), with country names on the land |
+| **By city** | One bubble per city, sized by paper count, labelled with the city name |
+| **By affiliation** | One bubble per institution, sized by paper count, labelled with the institution name, each placed on its city |
+
+* labels are placed automatically so they do not overlap; more names appear as you zoom in
+* hover reports the paper count; bubble colors match the bar charts below the map (countries / cities / affiliations)
+
+IDCite names every affiliation’s city and country but carries **no latitude or longitude**. CitationHub resolves 1,842 of 1,935 distinct city–country pairs against the [GeoNames](https://www.geonames.org) `cities500` gazetteer (CC BY 4.0) ahead of time (99.3% of papers that record a city) and ships that lookup with the application — nothing is geocoded at request time. Institutions sharing a city are fanned out around that shared point so each keeps its own bubble and label; the fan-out is a drawing device, not a measured campus location.
+
+---
+
+### 7. Analytics
+
+Corpus-wide statistics over all **1,857,503 citation events**:
+
+| Panel | What it shows |
+|---|---|
+| Citation Intent Distribution | Counts for the seven canonical intents |
+| Influential Citations | Share of events marked influential |
+| Citation Intent Trend Over Time | Intent mix by citing year |
+| Top Citing Venues | Journals and preprint servers that cite seed papers most often |
 
 ---
 
 ##  Key Statistics
 
-CitationHub currently contains:
+IDCite Version 3 (the data layer CitationHub reads):
 
-| Category          |  Count |
-| ----------------- | -----: |
-| Seed Papers       | 23,479 |
-| Citation Events   | 1.83M+ |
-| Citing Papers     | 1.44M+ |
-| Authors           | 16,839 |
-| Countries         |    108 |
-| Scientific Fields |     21 |
+| Category          |     Count |
+| ----------------- | --------: |
+| Seed Papers       |    23,479 |
+| Citation Events   | 1,857,503 |
+| Citing Papers     | 1,467,045 |
+| Authors           |    16,839 |
+| Countries         |       108 |
+| Scientific Fields |        21 |
+
+The knowledge-graph tables add 3,418,433 nodes and 6,855,117 edges; the SPARQL index holds about 25.1 million triples. Home-page cards may differ slightly from these release counts (for example seven canonical intents versus 31 observed labels).
 
 This makes CitationHub one of the largest multidisciplinary citation-context-aware resources.
 
@@ -201,19 +244,19 @@ These intent labels provide controllable and interpretable signals for:
 
 ### Intent-aware Citation Retrieval
 
-Intent-conditioned citation recommendation and selective reranking.
+Intent-conditioned citation recommendation and selective reranking, using the seven canonical intents and in-text citation contexts rather than citation counts alone.
 
 ### Scholarly Knowledge Graph Construction
 
-Citation events → RDF triples → semantic scholarly graphs.
+Citation events → `kg_nodes` / `kg_edges` Parquet → N-Triples → QLever. The SPARQL explorer queries that graph with a small ontology (`ch:`).
 
 ### Contextual Citation Evaluation
 
-Moving beyond simple citation counts toward semantic impact measurement.
+Moving beyond simple citation counts toward semantic impact measurement — intent mix, influential-citation share, and citing venues.
 
 ### Research Trend Discovery
 
-Field-specific citation behaviors and knowledge evolution analysis.
+Field-specific citation behaviors and knowledge evolution analysis, including intent trends by citing year and geographic concentration of affiliations.
 
 ---
 
