@@ -281,3 +281,11 @@ We are expanding CitationHub toward:
 * benchmark datasets for top-tier citation retrieval research
 
 ---
+
+## Note on `app.py`
+
+`app.py` in this repository is **not** the CitationHub system (the Next.js / FastAPI website at [citation-hub-website.vercel.app](https://citation-hub-website.vercel.app)). It is a **Streamlit dashboard** over IDCite: a compact, single-file prototype for browsing seed papers, citation events, intents, and simple network views.
+
+If you want to stand up a dashboard on IDCite quickly — without deploying the full CitationHub stack — use `app.py` and `requirements.txt` in this repository. Point it at a local Parquet directory (`CITATIONHUB_DATA_DIR`) or a Hugging Face dataset (`HF_REPO_ID`). The production interface and its documentation live in [CitationHub_Website](https://github.com/SeohyunNam/CitationHub_Website) and [CitationHub-System](https://github.com/SeohyunNam/CitationHub-System).
+
+---
