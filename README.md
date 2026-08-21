@@ -287,4 +287,8 @@ It is a **Streamlit dashboard** over IDCite: a compact, single-file prototype fo
 
 If you want to stand up a dashboard on IDCite quickly, you can use `app.py` and `requirements.txt` in this repo. Point it at a local Parquet directory (`CITATIONHUB_DATA_DIR`) or a Hugging Face dataset (`HF_REPO_ID`).
 
+For detailed description of the full **CitationHub System**, please refer to the dedicated repository:
+
+**CitationHub System:**  [SeohyunNam/CitationHub-System: Documentation for CitationHub System](https://github.com/SeohyunNam/CitationHub-System)
+
 ---
