@@ -95,6 +95,7 @@ The live interface is [CitationHub](https://citation-hub-website.vercel.app). It
 Catalogue of the 23,479 highly cited **seed papers**.
 
 * token-based search on titles and DOIs (not only exact strings)
+* **Advanced search** from Home: title, author, journal, and publication-year range; filled fields are combined, and every word in a field must match
 * sidebar filters: **Field**, **Country**, **Journal**
 * pagination and CSV export of the result list
 
