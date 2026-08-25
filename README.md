@@ -2,7 +2,7 @@
 
 [![CitationHub Website](https://img.shields.io/badge/CitationHub-Website-green)](https://citation-hub-website.vercel.app/)
 [![IDCite Project Page](https://img.shields.io/badge/IDCite-Project%20Page-purple)](https://seohyunnam.github.io/IDCite-Website/)
-[![Interactive Dashboard](https://img.shields.io/badge/Live-Demo-blue)](https://app.arcade.software/share/videos/82VtIYDsOhm1eMdnMzDf)
+[![Interactive Dashboard](https://img.shields.io/badge/Live-Demo-blue)](https://app.arcade.software/share/videos/19ledKuzOhMuJOPhVr4K)
 [![HuggingFace Space](https://img.shields.io/badge/HuggingFace-Space-yellow)](https://huggingface.co/spaces/Daniel0315/cithub_website)
 [![HuggingFace Dataset](https://img.shields.io/badge/HuggingFace-Dataset-orange)](https://huggingface.co/datasets/Daniel0315/CitationHub)
 [![Zenodo Record](https://img.shields.io/badge/Zenodo-Record-blue)](https://doi.org/10.5281/zenodo.20796923)
@@ -82,7 +82,7 @@ CitationHub is therefore **not a separate version of the IDCite dataset**, but a
 
 The clip above is the **Streamlit dashboard** in this repository (`app.py`), not the CitationHub website. It is a lightweight IDCite browser: seed papers, citation contexts and intents, and simple network views, meant for anyone who wants a dashboard up quickly.
 
-**🎥 See the Streamlit dashboard in action:** [Watch the interactive demo](https://app.arcade.software/share/videos/82VtIYDsOhm1eMdnMzDf)
+**🎥 See the Streamlit dashboard in action:** [Watch the interactive demo](https://app.arcade.software/share/videos/19ledKuzOhMuJOPhVr4K)
 
 ---
 
