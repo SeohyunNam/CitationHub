@@ -82,7 +82,7 @@ CitationHub is therefore **not a separate version of the IDCite dataset**, but a
 
 The clip above is the **Streamlit dashboard** in this repository (`app.py`), not the CitationHub website. It is a lightweight IDCite browser: seed papers, citation contexts and intents, and simple network views, meant for anyone who wants a dashboard up quickly.
 
-**🎥 See the Streamlit dashboard in action:** [Watch the interactive demo](https://app.arcade.software/share/videos/19ledKuzOhMuJOPhVr4K)
+**🎥 Watch the CitationHub System in action:** [Watch the interactive demo](https://app.arcade.software/share/videos/19ledKuzOhMuJOPhVr4K)
 
 ---
 
